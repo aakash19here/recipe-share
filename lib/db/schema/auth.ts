@@ -6,6 +6,8 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
+import { relations } from "drizzle-orm";
+import { recipes } from "@/lib/db/schema/recipe";
 
 export const users = pgTable("user", {
   id: text("id").notNull().primaryKey(),
@@ -14,6 +16,10 @@ export const users = pgTable("user", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
 });
+
+export const userRelations = relations(users, ({ many }) => ({
+  recipes: many(recipes),
+}));
 
 export const accounts = pgTable(
   "account",
