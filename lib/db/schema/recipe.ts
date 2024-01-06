@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   json,
   pgEnum,
@@ -14,8 +15,6 @@ export const recipePreferenceEnum = pgEnum("recipe_preference", [
   "veg",
   "non_veg",
   "vegan",
-  "glutten_free",
-  "keto",
 ]);
 
 export const recipeCourseEnum = pgEnum("recipe_course", [
@@ -31,6 +30,7 @@ export const recipeCuisineEnum = pgEnum("recipe_cuisine", [
   "french",
   "chinese",
   "japanese",
+  "something else",
 ]);
 
 export const recipeMethodEnum = pgEnum("recipe_method", [
@@ -49,6 +49,7 @@ export const recipeTypeEnum = pgEnum("recipe_type", [
 
 export const recipes = pgTable("recipe", {
   id: text("id").primaryKey().notNull(),
+  isPublished: boolean("is_published"),
   name: varchar("name", { length: 256 }).notNull(),
   cookingTime: integer("cooking_time").notNull(),
   ingredients: text("ingredients").notNull(),

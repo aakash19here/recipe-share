@@ -1,0 +1,1 @@
+ALTER TYPE "recipe_cuisine" ADD VALUE 'something else';
