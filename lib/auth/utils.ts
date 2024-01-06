@@ -25,7 +25,6 @@ export type AuthSession = {
 };
 
 export const authOptions: NextAuthOptions = {
-  //@ts-expect-error
   adapter: DrizzleAdapter(db),
   callbacks: {
     session: ({ session, user }) => {

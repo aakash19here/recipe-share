@@ -34,6 +34,8 @@ import clsx from "clsx";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Upload } from "lucide-react";
 import React from "react";
+import { UploadButton } from "@/lib/uploadthing";
+import { toast } from "../ui/use-toast";
 
 const BlockNote = dynamic(() => import("../blocknote-editor"), { ssr: false });
 
@@ -73,8 +75,25 @@ export function RecipeForm() {
         className="max-w-6xl mx-auto space-y-4"
       >
         <div className="w-[300px] h-[300px] flex flex-col items-center justify-center border-[3px] border-dashed mx-auto">
-          <Upload size={80} />
-          Upload Image
+          <UploadButton
+            onUploadProgress={(p) => {
+              console.log(p);
+            }}
+            endpoint="imageUploader"
+            onClientUploadComplete={(res) => {
+              // Do something with the response
+              console.log("Files: ", res);
+              console.log(res[0].url);
+              form.setValue("image", res[0].url);
+              toast({
+                description: "Upload complete",
+              });
+            }}
+            onUploadError={(error: Error) => {
+              // Do something with the error.
+              alert(`ERROR! ${error.message}`);
+            }}
+          />
         </div>
         <FormField
           control={form.control}
@@ -305,10 +324,7 @@ export function RecipeForm() {
         </div>
         <div className="flex flex-col self-start gap-2 my-3">
           <FormLabel className="">Steps</FormLabel>
-          <FormDescription className="mx-2 flex items-center">
-            <span>
-              <ArrowRight />
-            </span>
+          <FormDescription className="flex items-center">
             Specify how to make the recipe (It's upon you how better you can
             write it)
           </FormDescription>

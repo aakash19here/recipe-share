@@ -8,7 +8,7 @@ Highly WIP
 
 - [ ] Improve UI
 - [ ] Sync between db and localStorage
-- [ ] Setup upload thing for image uploads
+- [x] Setup upload thing for image uploads
 - [ ] Stripe for limiting recipe creations
 - [ ] Redis for caching (Not fixed as of now)
 - [ ] SEO
