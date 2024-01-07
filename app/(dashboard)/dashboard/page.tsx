@@ -2,19 +2,32 @@ import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/shell";
 import { authOptions, getUserAuth } from "@/lib/auth/utils";
 import { DashboardHeader } from "@/components/header";
-import { Button } from "@/components/ui/button";
 import { fontHeading } from "@/lib/font";
+import { CreateRecipeButton } from "@/components/create-recipe";
+import { db } from "@/lib/db";
+import { recipes } from "@/lib/db/schema/recipe";
+import { eq } from "drizzle-orm";
+import { RecipeItem } from "@/components/recipe-item";
 
 export const metadata = {
   title: "Dashboard",
 };
 
 export default async function DashboardPage() {
-  const user = await getUserAuth();
+  const { session } = await getUserAuth();
 
-  if (!user) {
+  if (!session) {
     redirect(authOptions?.pages?.signIn || "/login");
   }
+
+  const { user } = session;
+
+  const userRecipes = await db
+    .select()
+    .from(recipes)
+    .where(eq(recipes.userId, user.id));
+
+  console.log(userRecipes);
 
   return (
     <DashboardShell>
@@ -23,8 +36,13 @@ export default async function DashboardPage() {
         heading="Recipes"
         text="Create and manage recipes."
       >
-        <Button>New Recipe</Button>
+        <CreateRecipeButton />
       </DashboardHeader>
+      <div className="divide-y divide-border rounded-md border">
+        {userRecipes.map((recipe) => (
+          <RecipeItem key={recipe.id} post={recipe} />
+        ))}
+      </div>
       You don't have any recipes created.
     </DashboardShell>
   );

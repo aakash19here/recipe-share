@@ -7,8 +7,11 @@ Highly WIP
 ## Todo
 
 - [ ] Improve UI
-- [ ] Sync between db and localStorage
+- [x] Sync between db and localStorage
 - [x] Setup upload thing for image uploads
+- [ ] Fix types for validators and on db
+  - [ ] Ingredients and requirements
+  - [ ] Editor output
 - [ ] Stripe for limiting recipe creations
 - [ ] Redis for caching (Not fixed as of now)
 - [ ] SEO

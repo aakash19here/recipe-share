@@ -28,20 +28,36 @@ import {
   recipeMethodEnum,
   recipePreferenceEnum,
   recipeTypeEnum,
+  recipes,
 } from "@/lib/db/schema/recipe";
 import { Button } from "../ui/button";
 import clsx from "clsx";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Upload } from "lucide-react";
 import React from "react";
 import { UploadButton } from "@/lib/uploadthing";
-import { toast } from "../ui/use-toast";
+import { toast } from "sonner";
+import { updateRecipe } from "@/app/action/recipe";
 
 const BlockNote = dynamic(() => import("../blocknote-editor"), { ssr: false });
 
-export function RecipeForm() {
+export function RecipeForm({
+  recipe,
+}: {
+  recipe: typeof recipes.$inferSelect;
+}) {
   const form = useForm<z.infer<typeof recipeSchema>>({
     resolver: zodResolver(recipeSchema),
+    defaultValues: {
+      name: recipe.name || "",
+      image: recipe.image || "",
+      cookingTime: String(recipe.cookingTime) || undefined,
+      recipeCuisine: recipe.recipeCuisine || undefined,
+      recipeCourse: recipe.recipeCourse || undefined,
+      recipeMethod: recipe.recipeMethod || undefined,
+      steps: recipe.steps || "",
+      recipeType: recipe.recipeType || undefined,
+      recipePreference: recipe.recipePreference || undefined,
+    },
   });
 
   const {
@@ -62,10 +78,15 @@ export function RecipeForm() {
     control: form.control,
   });
 
-  function onSubmit(values: z.infer<typeof recipeSchema>) {
+  async function onSubmit(values: z.infer<typeof recipeSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+
+    await updateRecipe(values, recipe.id);
+
+    localStorage.removeItem(`recipe_${recipe.id}`);
+
+    console.log("Values is that you ?", values);
   }
 
   return (
@@ -85,9 +106,7 @@ export function RecipeForm() {
               console.log("Files: ", res);
               console.log(res[0].url);
               form.setValue("image", res[0].url);
-              toast({
-                description: "Upload complete",
-              });
+              toast("Upload complete");
             }}
             onUploadError={(error: Error) => {
               // Do something with the error.
@@ -118,7 +137,6 @@ export function RecipeForm() {
                 <FormControl>
                   <Input type="number" min={1} placeholder="1" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -129,7 +147,10 @@ export function RecipeForm() {
               <FormItem>
                 <FormLabel>Recipe course</FormLabel>
                 <FormControl>
-                  <Select {...field}>
+                  <Select
+                    onValueChange={(e) => form.setValue("recipeCourse", e)}
+                    defaultValue={form.watch("recipeCourse")}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select course type" />
                     </SelectTrigger>
@@ -152,7 +173,10 @@ export function RecipeForm() {
               <FormItem>
                 <FormLabel>Recipe cuisine</FormLabel>
                 <FormControl>
-                  <Select {...field}>
+                  <Select
+                    onValueChange={(e) => form.setValue("recipeCuisine", e)}
+                    defaultValue={form.watch("recipeCuisine")}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select cuisine type" />
                     </SelectTrigger>
@@ -175,7 +199,10 @@ export function RecipeForm() {
               <FormItem>
                 <FormLabel>Recipe method</FormLabel>
                 <FormControl>
-                  <Select {...field}>
+                  <Select
+                    onValueChange={(e) => form.setValue("recipeMethod", e)}
+                    defaultValue={form.watch("recipeMethod")}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select recipe method" />
                     </SelectTrigger>
@@ -198,11 +225,14 @@ export function RecipeForm() {
               <FormItem>
                 <FormLabel>Recipe Preference</FormLabel>
                 <FormControl>
-                  <Select {...field}>
+                  <Select
+                    onValueChange={(e) => form.setValue("recipePreference", e)}
+                    defaultValue={form.watch("recipePreference")}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select recipe preference" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent {...field}>
                       {recipePreferenceEnum.enumValues.map((value, id) => (
                         <SelectItem value={value} key={id}>
                           {value}
@@ -217,11 +247,14 @@ export function RecipeForm() {
           <FormField
             control={form.control}
             name="recipeType"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Recipe Type</FormLabel>
                 <FormControl>
-                  <Select {...field}>
+                  <Select
+                    onValueChange={(e) => form.setValue("recipeType", e)}
+                    defaultValue={form.watch("recipeType")}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select recipe type" />
                     </SelectTrigger>
@@ -285,7 +318,7 @@ export function RecipeForm() {
               <FormField
                 control={form.control}
                 key={field.id}
-                name={`ingredients.${index}.value`}
+                name={`requirements.${index}.value`}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className={clsx(index !== 0 && "sr-only")}>
@@ -330,7 +363,8 @@ export function RecipeForm() {
           </FormDescription>
         </div>
         {/* Best editor so far <3 */}
-        <BlockNote />
+        <BlockNote form={form} recipe={recipe} />
+        <Button>Save</Button>
       </form>
     </Form>
   );

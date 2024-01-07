@@ -7,23 +7,31 @@ import {
   getDefaultReactSlashMenuItems,
   useBlockNote,
 } from "@blocknote/react";
-import React from "react";
+import React, { useEffect } from "react";
 import "@blocknote/core/style.css";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { recipes } from "@/lib/db/schema/recipe";
 
-export default function BlockNote() {
+interface BlockNoteProps {
+  recipe: Pick<typeof recipes.$inferSelect, "id" | "steps">;
+  form: any;
+}
+
+export default function BlockNote({ recipe, form }: BlockNoteProps) {
   const slashMenuItems: ReactSlashMenuItem[] = getDefaultReactSlashMenuItems();
   const newSlashMenuItems = slashMenuItems.filter((i) => i.name !== "Image");
-  const [content, setContent] = useLocalStorage("content", [
-    { content: "hello block note" },
-  ]);
+  const [content, setContent] = useLocalStorage(`recipe_${recipe.id}`, []);
 
   const editor: BlockNoteEditor = useBlockNote({
     slashMenuItems: newSlashMenuItems,
-    initialContent: content,
+    //@ts-expect-error
+    initialContent: recipe.steps ? recipe.steps : content,
     onEditorContentChange(editor) {
-      //@ts-expect-error
-      setContent(editor.topLevelBlocks);
+      form.setValue("steps", editor.topLevelBlocks);
+      if (!recipe.steps) {
+        form.setValue("steps", content);
+        setContent(editor.topLevelBlocks);
+      }
     },
   });
 
