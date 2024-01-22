@@ -54,7 +54,7 @@ export const recipes = pgTable("recipe", {
   cookingTime: integer("cooking_time"),
   ingredients: text("ingredients"),
   requirements: text("requirements"),
-  steps: jsonb("steps"),
+  steps: jsonb("steps").array(),
   slug: varchar("slug", { length: 256 }).notNull(),
   image: text("image"),
   likes: integer("likes").notNull().default(0),

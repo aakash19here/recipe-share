@@ -54,7 +54,6 @@ export function RecipeForm({
       recipeCuisine: recipe.recipeCuisine || undefined,
       recipeCourse: recipe.recipeCourse || undefined,
       recipeMethod: recipe.recipeMethod || undefined,
-      steps: recipe.steps || "",
       recipeType: recipe.recipeType || undefined,
       recipePreference: recipe.recipePreference || undefined,
     },
@@ -77,6 +76,8 @@ export function RecipeForm({
     name: "requirements",
     control: form.control,
   });
+
+  console.log("Recipe steps from db", recipe.steps);
 
   async function onSubmit(values: z.infer<typeof recipeSchema>) {
     // Do something with the form values.

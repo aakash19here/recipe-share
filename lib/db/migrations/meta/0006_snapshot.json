@@ -1,5 +1,5 @@
 {
-  "id": "ef6a4c1e-7dd9-4836-ac4c-f4675d1817ca",
+  "id": "c508268c-b7b4-4f6b-a3d0-b5cf05502c6d",
   "prevId": "b50b1d9d-8761-4baf-9048-5fdd0e1f6f63",
   "version": "5",
   "dialect": "pg",
@@ -263,7 +263,7 @@
         },
         "steps": {
           "name": "steps",
-          "type": "jsonb",
+          "type": "jsonb[]",
           "primaryKey": false,
           "notNull": false
         },

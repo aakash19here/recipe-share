@@ -20,16 +20,26 @@ interface BlockNoteProps {
 export default function BlockNote({ recipe, form }: BlockNoteProps) {
   const slashMenuItems: ReactSlashMenuItem[] = getDefaultReactSlashMenuItems();
   const newSlashMenuItems = slashMenuItems.filter((i) => i.name !== "Image");
-  const [content, setContent] = useLocalStorage(`recipe_${recipe.id}`, []);
+  const [content, setContent] = useLocalStorage(`recipe_${recipe.id}`, [
+    {
+      content: "",
+    },
+  ]);
+
+  useEffect(() => {
+    if (!recipe.steps) {
+      form.setValue("steps", content);
+    }
+  }, [form, content]);
 
   const editor: BlockNoteEditor = useBlockNote({
     slashMenuItems: newSlashMenuItems,
-    //@ts-expect-error
     initialContent: recipe.steps ? recipe.steps : content,
     onEditorContentChange(editor) {
-      form.setValue("steps", editor.topLevelBlocks);
-      if (!recipe.steps) {
-        form.setValue("steps", content);
+      if (recipe.steps) {
+        form.setValue("steps", editor.topLevelBlocks);
+      } else {
+        //@ts-expect-error
         setContent(editor.topLevelBlocks);
       }
     },
